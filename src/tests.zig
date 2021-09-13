@@ -3,11 +3,11 @@ const testing = std.testing;
 const mimalloc_allocator = @import("main.zig").mimalloc_allocator;
 
 test "allocate memory and free" {
-    conswidth: i32,
+    const TestStruct = struct {
+        width: i32,
         height: i32,
         title: []const u8,
-        index: usize,t TestStruct = struct {
-        
+        index: usize,
     };
 
     const memory: []TestStruct = mimalloc_allocator.alloc(TestStruct, 1) catch @panic("test failure");
