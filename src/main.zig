@@ -5,12 +5,11 @@ const debug = std.debug;
 
 const Allocator = mem.Allocator;
 
-// const c = @cImport(@cInclude("zig_mimalloc.h"));
-const c = @cImport(@cInclude("mimalloc.h"));
+const mi = @cImport(@cInclude("mimalloc.h"));
 
 pub export const mimalloc_allocator: *Allocator = &mimalloc_allocator_state;
 
-var mimalloc_allocator_state = Allocator {
+var mimalloc_allocator_state = Allocator{
     .allocFn = mimallocAllocFn,
     .resizeFn = mimallocResizeFn,
 };
@@ -26,12 +25,13 @@ fn mimallocAllocFn(
     debug.assert(ptr_align > 0);
     debug.assert(math.isPowerOfTwo(ptr_align));
 
-    var ptr: [*]u8 = @ptrCast([*]u8, c.mi_malloc_aligned(len, ptr_align) orelse return error.OutOfMemory);
+    var ptr: [*]u8 = @ptrCast([*]u8, mi.mi_malloc_aligned(len, ptr_align)
+        orelse return error.OutOfMemory);
     if (len_align == 0) {
         return ptr[0..len];
     }
 
-    const full_len = c.mi_malloc_size(ptr);
+    const full_len = mi.mi_malloc_size(ptr);
     return ptr[0..mem.alignBackwardAnyAlign(full_len, len_align)];
 }
 
@@ -44,7 +44,7 @@ fn mimallocResizeFn(
     ret_addr: usize
 ) mem.Allocator.Error!usize {
     if (new_len == 0) {
-        c.mi_free(buf.ptr);
+        mi.mi_free(buf.ptr);
         return 0;
     }
 
@@ -52,7 +52,7 @@ fn mimallocResizeFn(
         return mem.alignAllocLen(buf.len, new_len, len_align);
     }
 
-    const full_len = c.mi_malloc_size(buf.ptr);
+    const full_len = mi.mi_malloc_size(buf.ptr);
     if (new_len <= buf.len) {
         return mem.alignAllocLen(full_len, new_len, len_align);
     }

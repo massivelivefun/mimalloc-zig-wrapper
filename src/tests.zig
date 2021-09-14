@@ -10,7 +10,8 @@ test "allocate memory and free" {
         index: usize,
     };
 
-    const memory: []TestStruct = mimalloc_allocator.alloc(TestStruct, 1) catch @panic("test failure");
+    const memory: []TestStruct = mimalloc_allocator.alloc(TestStruct, 1)
+        catch @panic("test failure");
     mimalloc_allocator.free(memory);
 }
 
@@ -22,9 +23,10 @@ test "allocate memory, use it and free" {
         index: usize,
     };
 
-    const memory: []TestStruct = mimalloc_allocator.alloc(TestStruct, 1) catch @panic("test failure");
+    const memory: []TestStruct = mimalloc_allocator.alloc(TestStruct, 1)
+        catch @panic("test failure");
 
-    memory[0] = TestStruct {
+    memory[0] = TestStruct{
         .width = 1280,
         .height = 720,
         .title = "Should work fine!",
@@ -46,7 +48,8 @@ test "allocate memory, use it, reallocate memory, use it and free" {
         index: usize,
     };
 
-    var memory: []TestStruct = mimalloc_allocator.alloc(TestStruct, 2) catch @panic("test failure");
+    var memory: []TestStruct = mimalloc_allocator.alloc(TestStruct, 2)
+        catch @panic("test failure");
 
     memory[0] = TestStruct{
         .width = 1280,
@@ -70,7 +73,8 @@ test "allocate memory, use it, reallocate memory, use it and free" {
     try testing.expect(memory[1].height == 820);
     try testing.expect(memory[1].index == 120);
 
-    memory = mimalloc_allocator.realloc(memory, 4) catch @panic("test failure");
+    memory = mimalloc_allocator.realloc(memory, 4)
+        catch @panic("test failure");
 
     memory[0] = TestStruct{
         .width = 6122,
