@@ -6,7 +6,7 @@ const Builder = @import("std").build.Builder;
 pub fn build(b: *Builder) void {
     const mode = b.standardReleaseOptions();
 
-    const lib = b.addStaticLibrary("zig-mimalloc-wrapper", "src/main.zig");
+    const lib = b.addStaticLibrary("mimalloc-zig-wrapper", "src/main.zig");
     lib.addSystemIncludeDir("../mimalloc/include");
     lib.addLibPath("../mimalloc/out/msvc-x64/Release");
     lib.addLibPath("C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/lib/x64");
