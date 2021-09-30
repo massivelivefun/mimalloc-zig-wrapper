@@ -1,11 +1,11 @@
-# zig-mimalloc-wrapper
+# mimalloc-zig-wrapper
 A lightweight implementation of Zig's std.mem.Allocator interface that wraps around Microsoft's mimalloc.
 
 ## Usage
 
 Use this library as a Zig library ([instructions here](https://github.com/ziglang/zig/wiki/Zig-Build-System#use-a-zig-library)) and then add something like this to your root source file:
 ```zig
-const mimalloc = @import("zig-mimalloc-wrapper");
+const mimalloc = @import("mimalloc-zig-wrapper");
 const mi = mimalloc.mimalloc_allocator;
 
 pub fn main() !void {
