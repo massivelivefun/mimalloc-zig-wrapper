@@ -1,6 +1,8 @@
 # mimalloc-zig-wrapper
 A lightweight implementation of Zig's std.mem.Allocator interface that wraps around Microsoft's mimalloc.
 
+Works with Zig 0.15.2.
+
 ## Usage
 
 Use this library as a Zig library ([instructions here](https://github.com/ziglang/zig/wiki/Zig-Build-System#use-a-zig-library)) and then add something like this to your root source file:

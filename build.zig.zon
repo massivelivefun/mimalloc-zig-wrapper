@@ -1,0 +1,12 @@
+.{
+    .name = .mimalloc_zig_wrapper,
+    .version = "0.15.2",
+    .dependencies = .{
+        .mimalloc = .{
+            .url = "https://github.com/microsoft/mimalloc/archive/refs/tags/v2.1.7.tar.gz",
+            .hash = "N-V-__8AAJkgRgCbuh_E-qwB0e4keji9ufNAzmDkV9GU-p2k",
+        },
+    },
+    .paths = .{""},
+    .fingerprint = 0xaa187836f9eed5f5,
+}

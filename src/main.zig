@@ -7,55 +7,63 @@ const Allocator = mem.Allocator;
 
 const mi = @cImport(@cInclude("mimalloc.h"));
 
-pub export const mimalloc_allocator: *Allocator = &mimalloc_allocator_state;
-
-var mimalloc_allocator_state = Allocator{
-    .allocFn = mimallocAllocFn,
-    .resizeFn = mimallocResizeFn,
+pub const mimalloc_allocator = Allocator{
+    .ptr = undefined,
+    .vtable = &mimalloc_vtable,
 };
 
-fn mimallocAllocFn(
-    self: *Allocator,
-    len: usize,
-    ptr_align: u29,
-    len_align: u29,
-    ret_addr: usize
-) Allocator.Error![]u8 {
-    debug.assert(len > 0);
-    debug.assert(ptr_align > 0);
-    debug.assert(math.isPowerOfTwo(ptr_align));
+const mimalloc_vtable = Allocator.VTable{
+    .alloc = mimallocAlloc,
+    .resize = mimallocResize,
+    .free = mimallocFree,
+    .remap = mimallocRemap,
+};
 
-    var ptr: [*]u8 = @ptrCast([*]u8, mi.mi_malloc_aligned(len, ptr_align)
-        orelse return error.OutOfMemory);
-    if (len_align == 0) {
-        return ptr[0..len];
-    }
-
-    const full_len = mi.mi_malloc_size(ptr);
-    return ptr[0..mem.alignBackwardAnyAlign(full_len, len_align)];
+fn mimallocAlloc(ctx: *anyopaque, len: usize, ptr_align: mem.Alignment, ret_addr: usize) ?[*]u8 {
+    _ = ctx;
+    _ = ret_addr;
+    return @as(?[*]u8, @ptrCast(mi.mi_malloc_aligned(len, ptr_align.toByteUnits())));
 }
 
-fn mimallocResizeFn(
-    self: *Allocator,
+fn mimallocResize(
+    ctx: *anyopaque,
     buf: []u8,
-    buf_align: u29,
+    buf_align: mem.Alignment,
     new_len: usize,
-    len_align: u29,
-    ret_addr: usize
-) mem.Allocator.Error!usize {
-    if (new_len == 0) {
-        mi.mi_free(buf.ptr);
-        return 0;
-    }
-
-    if (new_len <= buf.len) {
-        return mem.alignAllocLen(buf.len, new_len, len_align);
-    }
-
+    ret_addr: usize,
+) bool {
+    _ = ctx;
+    _ = buf_align;
+    _ = ret_addr;
+    
+    // Check if the allocated block is already large enough
     const full_len = mi.mi_malloc_size(buf.ptr);
-    if (new_len <= buf.len) {
-        return mem.alignAllocLen(full_len, new_len, len_align);
+    if (new_len <= full_len) {
+        return true;
     }
+    return false;
+}
 
-    return error.OutOfMemory;
+fn mimallocRemap(
+    ctx: *anyopaque,
+    buf: []u8,
+    buf_align: mem.Alignment,
+    new_len: usize,
+    ret_addr: usize,
+) ?[*]u8 {
+    _ = ctx;
+    _ = ret_addr;
+    return @as(?[*]u8, @ptrCast(mi.mi_realloc_aligned(buf.ptr, new_len, buf_align.toByteUnits())));
+}
+
+fn mimallocFree(
+    ctx: *anyopaque,
+    buf: []u8,
+    buf_align: mem.Alignment,
+    ret_addr: usize,
+) void {
+    _ = ctx;
+    _ = buf_align;
+    _ = ret_addr;
+    mi.mi_free(buf.ptr);
 }
