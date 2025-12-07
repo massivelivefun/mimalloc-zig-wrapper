@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) void {
     
     // Add mimalloc include path
     lib.addIncludePath(mimalloc_dep.path("include"));
-    
+
     // Compile mimalloc C source
     // src/static.c includes the necessary parts of mimalloc for a static build
     lib.addCSourceFile(.{
@@ -32,7 +32,7 @@ pub fn build(b: *std.Build) void {
 
     // Link standard C library
     lib.linkLibC();
-    
+
     // Windows specific system libraries often needed by mimalloc
     if (target.result.os.tag == .windows) {
         lib.linkSystemLibrary("advapi32");
@@ -48,7 +48,7 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
         }),
     });
-    
+
     // Test compilation also needs mimalloc sources and includes
     main_tests.addIncludePath(mimalloc_dep.path("include"));
     main_tests.addCSourceFile(.{
@@ -58,7 +58,7 @@ pub fn build(b: *std.Build) void {
         },
     });
     main_tests.linkLibC();
-    
+
     if (target.result.os.tag == .windows) {
         main_tests.linkSystemLibrary("advapi32");
         main_tests.linkSystemLibrary("bcrypt");
